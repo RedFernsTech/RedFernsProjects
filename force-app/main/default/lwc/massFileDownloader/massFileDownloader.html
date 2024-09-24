@@ -1,0 +1,849 @@
+<template>
+    <div data-id="headerDiv" class="slds-p-bottom_x-small">
+        <div class="slds-box" style="background-color: #F3F3F3;">
+            <table>
+                <tbody>
+                    <tr>
+                        <td style="width: 4%;">
+                            <div class="slds-float_right" style="cursor: pointer;" onclick={HandleLogoClick}>
+                                <img src={brandLogo} width="45" height="55" title="Redirect to our site">
+                            </div>
+                        </td>
+                        <td style="width: 91%;">
+                            <div class="slds-grid slds-grid_vertical">
+                                <div>
+                                    <span class="slds-text-heading_medium" style="cursor: pointer; color: #DF1919;"
+                                        title="Redirect to our site" onclick={HandleLogoClick}>
+                                        <b>RedFerns Tech Bulk File Downloader</b>
+                                    </span> &nbsp;
+                                    <span style="cursor: pointer; color: #DF1919; font-size: 15px;"
+                                        title="Redirect to our site" onclick={HandleLogoClick}>v1.0</span>
+                                </div>
+                                <div>
+                                    <span style="font-size: 13px;">Grab multiple files as a zip or each file
+                                        individually, all within our app with just one click.</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="width: 5%;">
+                            <div class="slds-float_right">
+                                <lightning-icon style="cursor: pointer;" icon-name="action:log_event"
+                                    title="Book a Demo" size="small" onclick={handleClickCalenderly}></lightning-icon>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <lightning-card hide-header>
+        <div data-id="parentDiv" class="slds-p-bottom_x-small">
+
+            <div lwc:if={showDataLoadSpinner}>
+                <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+            </div>
+
+            <div lwc:if={showDropDown} class="slds-align_absolute-center">
+
+                <lightning-button label="Show Filter" variant="neutral" icon-name="utility:down" icon-position="right"
+                    onclick={handleShowFilter}>
+                </lightning-button>
+            </div>
+
+            <div lwc:if={showFilter} style='background-color: white;'
+                class="slds-p-bottom_x-small slds-p-right_medium slds-p-left_medium slds-border_bottom">
+                <div class="slds-p-bottom_x-small">
+                    <div class="slds-grid">
+                        <div class="slds-col slds-size_12-of-12 slds-var-p-bottom_medium">
+                            <lightning-input type="text" label="Select Object" onchange={HandleOnSearchTextChange}
+                                value={searchText} placeholder="Enter Object Name or Object Api Name" required>
+                            </lightning-input>
+                            <div lwc:if={showObjList}>
+                                <div lwc:if={showSearchBarSpinnner}>
+                                    <div class="slds-is-relative slds-scrollable_y"
+                                        style="height: 110px; border: 1px solid #C9C9C9">
+                                        <lightning-spinner alternative-text='Loading' size="medium" variant="brand">
+                                        </lightning-spinner>
+                                    </div>
+                                </div>
+                                <div lwc:else>
+                                    <div class="slds-scrollable_y"
+                                        style="height: 110px; border: 1px solid #C9C9C9; background-color: white; z-index: 1;">
+                                        <template for:each={objNames} for:item="objName" for:index="index">
+                                            <div onclick={HandleOnObjClick} key={objName.QualifiedApiName}
+                                                data-id={index} class="objOnfocus slds-var-p-around_x-small"
+                                                style='cursor: pointer;'>
+                                                <span class="slds-text-body_regular"><b>{objName.Label}
+                                                    </b> &nbsp;({objName.QualifiedApiName})</span>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class={filterDisableClass}>
+                        <div class="slds-grid">
+                            <div class="slds-col slds-size_5-of-12">
+
+                                <table>
+                                    <tr>
+                                        <td style="width:30%">
+                                            <div> <b>Filter Based on Record</b> </div>
+                                        </td>
+
+                                        <td style="width:3%">
+                                            <div class="slds-p-bottom_xx-small">
+                                                <div>
+                                                    <div onmouseover={HandleOnMouseOverFilterOnRecord}
+                                                        onmouseleave={HandleOnMouseLeaveFilterOnRecord}>
+                                                        <lightning-icon icon-name="utility:info" size="xx-small"
+                                                            class="info-icon"></lightning-icon>
+                                                    </div>
+
+                                                    <div lwc:if={showHelpTextFilterOnRecord}>
+                                                        <div class="slds-is-absolute slds-popover slds-popover_tooltip"
+                                                            role="tooltip">
+                                                            <div class="slds-popover__body">Only one filter can be
+                                                                applied at a time; applying a new filter will remove the
+                                                                previous one.
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td style="width:67%">
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <lightning-tabset>
+
+                                    <lightning-tab label="Search">
+                                        <lightning-input type="text" onchange={HandleOnRecNameChange}
+                                            onfocus={handleFocusRecNameInput} placeholder="Enter Record Name"
+                                            value={filterRecordByMultipleNameInput}></lightning-input>
+
+                                        <div lwc:if={showRecNameList}>
+                                            <div lwc:if={showSearchNameSpinnner}>
+                                                <div class="slds-is-relative slds-scrollable_y"
+                                                    style="height: 110px; border: 1px solid #C9C9C9">
+                                                    <lightning-spinner alternative-text='Loading' size="medium"
+                                                        variant="brand">
+                                                    </lightning-spinner>
+                                                </div>
+                                            </div>
+                                            <div lwc:else>
+                                                <div class="slds-scrollable_y slds-var-p-top_xx-small slds-var-p-bottom_xx-small"
+                                                    style="height: 110px; border: 1px solid #C9C9C9; background-color: white; z-index: 1;">
+                                                    <template for:each={matchingRecords} for:item="record"
+                                                        for:index="index">
+                                                        <div key={record.recordId}
+                                                            class="objOnfocus slds-var-p-around_xx-small slds-grid slds-grid_vertical-align-center"
+                                                            style='cursor: pointer;'>
+                                                            <span class="slds-text-body_regular"><b>{record.recordName}
+                                                                </b> &nbsp;({record.recordId})</span>
+                                                            <lightning-button-stateful class="slds-col_bump-left"
+                                                                label-when-off="Add" label-when-on="Added"
+                                                                icon-name-when-off="utility:add"
+                                                                icon-name-when-on="utility:check" variant="text"
+                                                                selected={record.isSelected} data-id={record.recordId}
+                                                                onclick={handleClickRecordNameAdd}>
+                                                            </lightning-button-stateful>
+                                                        </div>
+                                                    </template>
+                                                </div>
+                                                <div class="slds-align_absolute-center"
+                                                    style="border: 1px solid #C9C9C9; background-color: #F3F3F3;">
+                                                    <lightning-button class="slds-p-around_x-small" label="Cancel"
+                                                        onclick={handleClickCancelRecName}></lightning-button>
+                                                    <lightning-button class="slds-p-around_x-small" label="Done"
+                                                        variant="brand" disabled={disableRecNameSearchDone}
+                                                        onclick={handleClickDoneRecName}></lightning-button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </lightning-tab>
+
+                                    <lightning-tab label="List view">
+                                        <div>
+                                            <div lwc:if={showListViewError}
+                                                class="slds-text-color_error slds-var-p-around_xxx-small">
+                                                To configure the list view filter, please contact your system
+                                                administrator.
+                                            </div>
+                                            <lightning-combobox options={listViewOptions} value={listViewId}
+                                                onchange={HandleListViewOptionChange} disabled={disableListComboBox}>
+                                            </lightning-combobox>
+                                        </div>
+                                    </lightning-tab>
+
+                                    <lightning-tab label="Advanced Search">
+                                        <table>
+                                            <tr>
+                                                <td style="width:90%">
+                                                    <lightning-textarea label={recAdvSearchLabel}
+                                                        value={tempRecordAdvancedSearchQuery}
+                                                        onchange={handleOnRecordAdvancedSearch}></lightning-textarea>
+                                                    <div class="slds-text-color_weak slds-text-body_small">WITH
+                                                        USER_MODE LIMIT 50000
+                                                    </div>
+                                                    <!-- <div lwc:if={showRecordAdvSearchError}
+                                                        class="slds-text-color_error slds-var-p-around_xx-small">
+                                                        {recordError}
+                                                    </div> -->
+                                                </td>
+                                                <td style="width:10%; position: relative;">
+                                                    <div class="slds-p-around_x-small">
+                                                        <div style="cursor: pointer; position: sticky; top: 35px;">
+                                                            <lightning-button label="Add" title="Add Filter"
+                                                                variant="brand"
+                                                                onclick={handleClickAddRecordAdvanceSearch}></lightning-button>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width:100%">
+                                                    <div lwc:if={showRecordAdvSearchError}
+                                                        class="slds-text-color_error slds-var-p-around_xx-small">
+                                                        {recordError}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </lightning-tab>
+                                </lightning-tabset>
+                            </div>
+
+                            <div class="slds-col slds-size_2-of-12">
+
+                            </div>
+
+                            <div class="slds-col slds-size_5-of-12">
+
+                                <table>
+                                    <tr>
+                                        <td style="width:25%">
+                                            <div> <b>Filter Based on File</b> </div>
+                                        </td>
+
+                                        <td style="width:3%">
+                                            <div class="slds-p-bottom_xx-small">
+                                                <div>
+                                                    <div onmouseover={HandleOnMouseOverFilterOnFile}
+                                                        onmouseleave={HandleOnMouseLeaveFilterOnFile}>
+                                                        <lightning-icon icon-name="utility:info" size="xx-small"
+                                                            class="info-icon"></lightning-icon>
+                                                    </div>
+
+                                                    <div lwc:if={showHelpTextFilterOnFile}>
+                                                        <div class="slds-is-absolute slds-popover slds-popover_tooltip"
+                                                            role="tooltip">
+                                                            <div class="slds-popover__body">Search and filter options
+                                                                can be applied simultaneously. Applying Advanced Search
+                                                                will remove other filter options, and vice versa.
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td style="width:72%">
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <lightning-tabset>
+                                    <lightning-tab label="Search">
+                                        <lightning-input type="text" placeholder="Enter File Name"
+                                            value={filterFileByName}
+                                            onchange={HandleOnFileNameChange}></lightning-input>
+                                    </lightning-tab>
+
+                                    <lightning-tab label="Filter">
+                                        <lightning-combobox options={fileFilterOptions} value={recordFilterValue}
+                                            onchange={HandleOnFileFilterChange}>
+                                        </lightning-combobox>
+
+                                        <div lwc:if={showCreatedDateFilterForFile}>
+                                            <div class="slds-grid">
+                                                <div class="slds-col slds-size_2-of-5">
+                                                    <lightning-combobox label="Select Operator"
+                                                        options={operatorOptions} value={filterCreatedDateOperator}
+                                                        onchange={HandleOnCreatedDateOperatorChange}>
+                                                    </lightning-combobox>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-5">
+
+                                                </div>
+                                                <div class="slds-col slds-size_2-of-5">
+                                                    <lightning-input type="date" label="Enter a date"
+                                                        value={filterCreatedDate}
+                                                        onchange={HandleOnFileFilterCreatedDateChange}>
+                                                    </lightning-input>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div lwc:elseif={showCreatedDateFromToFilterForFile}>
+                                            <div class="slds-grid">
+                                                <div class="slds-col slds-size_2-of-5">
+                                                    <lightning-input type="date" label="From"
+                                                        value={filterCreatedDateFrom}
+                                                        onchange={HandleOnFileFilterCreatedDateFromChange}>
+                                                    </lightning-input>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-5">
+                                                </div>
+                                                <div class="slds-col slds-size_2-of-5">
+                                                    <lightning-input type="date" label="To" value={filterCreatedDateTo}
+                                                        onchange={HandleOnFileFilterCreatedDateToChange}>
+                                                    </lightning-input>
+                                                </div>
+                                            </div>
+                                            <div lwc:if={showCreatedDateFromToError}
+                                                class="slds-text-color_error slds-var-p-around_xx-small">
+                                                Please enter a valid date range. 'To' date should not be earlier than
+                                                'From' date.
+                                            </div>
+                                        </div>
+
+                                        <div lwc:elseif={showLastModifiedDateFilterForFile}>
+                                            <div class="slds-grid">
+                                                <div class="slds-col slds-size_2-of-5">
+                                                    <lightning-combobox label="Select Operator"
+                                                        options={operatorOptions} value={filterLastModifiedDateOperator}
+                                                        onchange={HandleOnLastModifiedDateOperatorChange}>
+                                                    </lightning-combobox>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-5">
+
+                                                </div>
+                                                <div class="slds-col slds-size_2-of-5">
+                                                    <lightning-input type="date" label="Enter a date"
+                                                        value={filterLastModifiedDate}
+                                                        onchange={HandleOnLastModifiedDateChange}>
+                                                    </lightning-input>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div lwc:elseif={showLastModifiedDateFromToFilterForFile}>
+                                            <div class="slds-grid">
+                                                <div class="slds-col slds-size_2-of-5">
+                                                    <lightning-input type="date" label="From"
+                                                        value={filterLastModifiedDateFrom}
+                                                        onchange={HandleOnFileFilterLastModifiedDateFromChange}>
+                                                    </lightning-input>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-5">
+                                                </div>
+                                                <div class="slds-col slds-size_2-of-5">
+                                                    <lightning-input type="date" label="To"
+                                                        value={filterLastModifiedDateTo}
+                                                        onchange={HandleOnFileFilterLastModifiedDateToChange}>
+                                                    </lightning-input>
+                                                </div>
+                                            </div>
+                                            <div lwc:if={showLastModifiedDateFromToError}
+                                                class="slds-text-color_error slds-var-p-around_xx-small">
+                                                Please enter a valid date range. 'To' date should not be earlier than
+                                                'From' date.
+                                            </div>
+                                        </div>
+
+                                        <div lwc:elseif={showOwnerNameFilterForFile}>
+                                            <lightning-input type="text" label="Enter Owner Name"
+                                                onchange={HandleOnOwnerNameChange} value={ownerNameValue}>
+                                            </lightning-input>
+                                            <div lwc:if={showUserList} class="slds-scrollable_y"
+                                                style="height: 110px; border: 1px solid #C9C9C9; background-color: white">
+                                                <template lwc:if={filteredUserListInfo} for:each={filteredUserListInfo}
+                                                    for:item='currentUser'>
+                                                    <div key={currentUser.Id} data-id={currentUser.Id}
+                                                        class="objOnfocus slds-var-p-around_x-small"
+                                                        style='cursor: pointer;' onclick={handleOnUserClick}>
+                                                        <span class="slds-text-body_regular">{currentUser.Name}</span>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </div>
+
+                                        <div lwc:elseif={showFileTypeFilterForFile}>
+                                            <lightning-combobox label="Select File Type" class="slds-p-top_xx-small"
+                                                value={filterFileType} options={fileTypeListOptions}
+                                                onchange={HandleOnFileTypeChange}>
+                                            </lightning-combobox>
+                                        </div>
+
+                                        <div lwc:elseif={showFileSizeFilterForFile}>
+                                            <div class="slds-grid">
+                                                <div class="slds-col slds-size_3-of-12">
+                                                    <lightning-combobox label="Select Operator"
+                                                        options={operatorOptions} value={filterSizeOperator}
+                                                        onchange={HandleOnFileSizeOperatorChange}>
+                                                    </lightning-combobox>
+                                                </div>
+                                                <div class="slds-col slds-size_3-of-12">
+                                                    <lightning-input class="slds-p-left_xx-small" type="decimal"
+                                                        value={filterSize} label="File Size"
+                                                        onchange={HandleOnFileSizeChange}>
+                                                    </lightning-input>
+                                                </div>
+                                                <div class="slds-col slds-size_2-of-12">
+                                                    <lightning-combobox class="slds-p-left_xx-small" label="Unit"
+                                                        value={filterSizeUnit} options={fileSizeOptions}
+                                                        onchange={HandleOnFileSizeUnitChange}>
+                                                    </lightning-combobox>
+                                                </div>
+                                                <div class="slds-col slds-size_4-of-12">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </lightning-tab>
+
+                                    <lightning-tab label="Advanced Search">
+                                        <table>
+                                            <tr>
+                                                <td style="width:90%">
+                                                    <lightning-textarea
+                                                        label='SELECT Id, ... FROM ContentDocumentLink WHERE '
+                                                        value={tempFileAdvSearchValue}
+                                                        onchange={HandleOnfileAdvSearchChange}></lightning-textarea>
+                                                    <div class="slds-text-color_weak slds-text-body_small">
+                                                        WITH USER_MODE LIMIT 50000</div>
+                                                </td>
+                                                <td style="width:10%;">
+                                                    <div class="slds-p-around_x-small">
+                                                        <div style="cursor: pointer;">
+                                                            <lightning-button label="Add" title="Add" variant="brand"
+                                                                onclick={handleClickAddFileAdvanceSearch}></lightning-button>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width:100%">
+                                                    <div lwc:if={showFileAdvSearchError}
+                                                        class="slds-text-color_error slds-var-p-around_xx-small">
+                                                        {fileError}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </lightning-tab>
+                                </lightning-tabset>
+                            </div>
+                        </div>
+
+                        <div class="slds-var-p-top_x-small">
+                            <table>
+                                <tr>
+                                    <td style="width:8%">
+                                        <div> <b>Filters Applied</b> </div>
+                                    </td>
+
+                                    <td style="width:2%">
+                                        <div class="slds-p-bottom_xx-small">
+                                            <div>
+                                                <div onmouseover={HandleOnMouseOverFilterApplied}
+                                                    onmouseleave={HandleOnMouseLeaveFilterApplied}>
+                                                    <lightning-icon icon-name="utility:info" size="xx-small"
+                                                        class="info-icon"></lightning-icon>
+                                                </div>
+
+                                                <div lwc:if={showHelpTextFilterApplied}>
+                                                    <div class="slds-is-absolute slds-popover slds-popover_tooltip"
+                                                        role="tooltip">
+                                                        <div class="slds-popover__body">You can apply filters in the
+                                                            following combinations:
+                                                            <div>
+                                                                <b>Combination 1:</b>
+                                                            </div>
+                                                            <div>
+                                                                * Record Name = "RedfernTech", "Edge Solutions"
+                                                            </div>
+                                                            <div>
+                                                                * File Name = "cert" and Created Date > 2024-09-01
+                                                            </div>
+                                                            <div>
+                                                                <b>Combination 2:</b>
+                                                            </div>
+                                                            <div>
+                                                                Record Name = "RedfernTech", "Edge Solutions"
+                                                            </div>
+                                                            <div>
+                                                                File Advanced Search = ContentDocument.FileType = 'CSV'
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td style="width:90%">
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div class="slds-var-p-top_small">
+                            <table>
+                                <tr style="border: 1px solid #C9C9C9">
+                                    <td style="width:96%">
+                                        <div class="slds-p-around_x-small">
+                                            <table>
+                                                <tr>
+                                                    <td style="width:96%">
+                                                        <div lwc:if={showPill}>
+                                                            <template for:each={pillObjArray} for:item="currentPill">
+                                                                <lightning-pill lwc:if={currentPill.value}
+                                                                    key={currentPill.key}
+                                                                    style="--slds-c-pill-color-background:#F3F3F3"
+                                                                    name={currentPill.key} label={currentPill.value}
+                                                                    onremove={handleOnPillRemove}></lightning-pill>
+                                                            </template>
+                                                        </div>
+                                                        <div lwc:else style="color:#747474"
+                                                            class="slds-p-around_x-small slds-text-body_small">
+                                                            No filters were applied.
+                                                        </div>
+                                                    </td>
+                                                    <td style="width:4%">
+                                                        <lightning-button label="Clear"
+                                                            onclick={HandleOnFilterClear}></lightning-button>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </td>
+                                    <td style="width:4%; background-color:#0176D3">
+                                        <div class="slds-border_right slds-p-around_x-small slds-align_absolute-center"
+                                            style="cursor: pointer;" onclick={handleOnSearch}>
+                                            <lightning-icon style='--sds-c-icon-color-foreground-default:white'
+                                                icon-name="utility:search" title="Search"></lightning-icon>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class={filterDisableClass}>
+                    <div lwc:if={showUpArrow} class="slds-align_absolute-center containerClass">
+                        <lightning-button label="Hide Filter" variant="neutral" icon-name="utility:up"
+                            icon-position="right" onclick={handleHideFilter}>
+                        </lightning-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div lwc:if={showPagination} class={divSticky} data-id="stickyTop">
+            <div class="slds-p-bottom_x-small">
+                <div style="background-color: #F3F3F3; border: 1px solid #C9C9C9">
+                    <table>
+                        <tr>
+                            <td class='slds-p-around_x-small' style='width:2%;'>
+                                <div class="slds-align_absolute-center">
+                                    <lightning-input label="Select All File" type="checkbox-button" data-id="selectAll"
+                                        onclick={handleClickSelectAll}>
+                                    </lightning-input>
+                                </div>
+                            </td>
+
+                            <td class='slds-p-around_xxx-small' style='width:10%;'>
+                                <span class="slds-text-heading_small">Select All
+                                    Files</span>
+                            </td>
+
+                            <td class='slds-p-bottom_medium slds-p-top_xxx-small slds-p-left_xxx-small'
+                                style='width:10%;'>
+                                <div class="slds-align_absolute-center">
+                                    <lightning-combobox label="Sort By" options={sortByOptions}
+                                        value={displaySortByValue} onchange={sortByChange}
+                                        class="slds-p-around_xxx-small" placeholder="Sort By"></lightning-combobox>
+                                </div>
+                            </td>
+
+                            <td class='slds-p-bottom_medium slds-p-top_xxx-small' style='width:7%;'>
+                                <div class="slds-p-left_x-small slds-align_absolute-center">
+                                    <lightning-radio-group label="" options={ascOrDesOptions} value={ascOrDesvalue}
+                                        type="radio" onchange={ascOrDesChange}
+                                        class="slds-p-around_xxx-small"></lightning-radio-group>
+                                </div>
+                            </td>
+
+                            <td class='slds-p-around_small' style='width:33%;'>
+                                <div class="slds-align_absolute-center">
+                                    <button class="slds-button"
+                                        style="border: 1px solid #A5A5A5; border-radius: 0.25rem; padding: 0.25rem;">
+                                        <lightning-icon icon-name="utility:jump_to_left" size="small"
+                                            style="--sds-c-icon-color-foreground-default:#185DA4;"
+                                            onclick={handleOnPaginationCLick} title="First page">
+                                        </lightning-icon>
+                                    </button>
+                                    <button class="slds-button"
+                                        style="border: 1px solid #A5A5A5; border-radius: 0.25rem; padding: 0.25rem;">
+                                        <lightning-icon icon-name="utility:chevronleft" size="small"
+                                            style="--sds-c-icon-color-foreground-default:#185DA4;"
+                                            onclick={handleOnPaginationCLick} title="Previous Page"></lightning-icon>
+                                    </button>
+                                    <button lwc:if={showFirstButton}
+                                        style="background-Color:#185DA4; color: white; width:10%"
+                                        class='slds-button slds-button_neutral' name={firstButton}
+                                        onclick={handleOnPaginationCLick}>
+                                        {firstButton}
+                                    </button>
+                                    <button lwc:if={showSecondButton} class='slds-button slds-button_neutral'
+                                        style="width:10%" name={secondButton} onclick={handleOnPaginationCLick}>
+                                        {secondButton}
+                                    </button>
+                                    <button lwc:if={showThirdButton} class='slds-button slds-button_neutral'
+                                        style="width:10%" name={thirdButton} onclick={handleOnPaginationCLick}>
+                                        {thirdButton}
+                                    </button>
+                                    <div lwc:if={showThreeDots}
+                                        class="slds-p-left_xx-small slds-p-right_xx-small slds-p-top_small">. . .</div>
+                                    <button lwc:if={showLastButton} class='slds-button slds-button_neutral'
+                                        style="width:10%" name={lastButton} onclick={handleOnPaginationCLick}>
+                                        {lastButton}
+                                    </button>
+                                    <button class="slds-button"
+                                        style="border: 1px solid #A5A5A5; border-radius: 0.25rem; padding: 0.25rem;">
+                                        <lightning-icon style='--sds-c-icon-color-foreground-default:#185DA4;'
+                                            icon-name="utility:chevronright" size="small"
+                                            onclick={handleOnPaginationCLick} title="Next Page"></lightning-icon>
+                                    </button>
+                                    <button class="slds-button"
+                                        style="border: 1px solid #A5A5A5; border-radius: 0.25rem; padding: 0.25rem;">
+                                        <lightning-icon icon-name="utility:jump_to_right" size="small"
+                                            style="--sds-c-icon-color-foreground-default:#185DA4;"
+                                            onclick={handleOnPaginationCLick} title="Last Page">
+                                        </lightning-icon>
+                                    </button>
+                                </div>
+                            </td>
+
+                            <td class='slds-p-bottom_medium slds-p-top_xxx-small' style='width:8%;'>
+                                <div class="slds-align_absolute-center">
+                                    <lightning-combobox label="Files per page" options={recordsPerPageDropDown}
+                                        value={recordsPerPageOnDisplay}
+                                        onchange={recordsPerPageChange}></lightning-combobox>
+                                </div>
+                            </td>
+
+                            <td style='width:24%;'>
+                                <div class="slds-p-left_xx-small slds-p-right_xx-small slds-align_absolute-center">
+                                    <div class="slds-text-heading_small"> Showing <b
+                                            class="slds-m-left_xxx-small slds-m-right_x-small">({startOnDisplay}-{end})
+                                            / {totalRecords}</b>Files
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td style="width:6%; background-color:#0176D3; cursor: pointer;"
+                                onclick={OnClickMultiDownload}>
+                                <div class="slds-align_absolute-center">
+                                    <lightning-icon style='--sds-c-icon-color-foreground-default:white'
+                                        icon-name="utility:download" title="Download"></lightning-icon>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="slds-is-relative">
+                <div lwc:if={showPaginationSpinner}>
+                    <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+                </div>
+            </div>
+        </div>
+
+        <div lwc:if={showNoItemsMsg} style="background-color: #F3F3F3;">
+            <div style="height:100%; border: 1px solid #C9C9C9" class="slds-align_absolute-center" data-id="noItem">
+                <div class="slds-text-body_small">No items to display.</div>
+            </div>
+        </div>
+
+        <div lwc:else>
+            <template for:each={recordsToDisplay} for:item="currentFile">
+                <div class="slds-p-bottom_x-small" key={currentFile.id}>
+                    <table style="table-layout: fixed; border: 1px solid #C9C9C9" class={animationClass}>
+                        <tbody>
+                            <tr>
+                                <td style="width: 2%;" class="slds-p-around_x-small">
+                                    <div class="slds-align_absolute-center">
+                                        <lightning-input type="checkbox-button" data-cv-id={currentFile.cvId}
+                                            data-cdl-id={currentFile.cdlId} data-id="SelectFile"
+                                            onclick={handleClickSelectFile}>
+                                        </lightning-input>
+                                    </div>
+                                </td>
+
+                                <td style="width: 10%;" class="slds-p-around_x-small">
+                                    <div style='width: 60px; height: 60px; background-color:white;'
+                                        class="slds-align_absolute-center slds-border_top slds-border_right slds-border_bottom slds-border_left">
+                                        <div class="imgOnhover" style="width: 100%; height: 100%;">
+                                            <img src={currentFile.thumbnailUrl}
+                                                style="object-fit: contain; width: 100%; height: 100%;">
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td style="width: 28%" class="slds-p-around_x-small">
+                                    <b><span class="slds-text-heading_small">
+                                            <lightning-formatted-url value={currentFile.fileUrl}
+                                                tooltip="Navigate to File" label={currentFile.fileName}
+                                                target="_blank"></lightning-formatted-url>
+                                        </span></b>
+                                </td>
+
+                                <td style="width: 28%" class="slds-p-around_x-small">
+                                    <b><span class="slds-text-heading_small">
+                                            <lightning-formatted-url value={currentFile.recordUrl}
+                                                tooltip="Navigate to Record" label={currentFile.recordName}
+                                                target="_blank"></lightning-formatted-url>
+                                        </span></b>
+                                </td>
+
+                                <td style="width: 26%" class="slds-p-around_x-small">
+                                    <table>
+                                        <tbody>
+                                            <tr>
+                                                <td style="width: 26%">
+                                                    <span class="slds-text-body_small custom-small"><b>Created By:
+                                                        </b></span>
+                                                </td>
+                                                <td style="width: 30%">
+                                                    <span
+                                                        class="slds-text-body_small custom-small">{currentFile.createdBy}</span>
+                                                </td>
+                                                <td style="width: 16%">
+                                                    <span
+                                                        class="slds-p-left_small slds-text-body_small custom-small"><b>Size:
+                                                        </b></span>
+                                                </td>
+                                                <td style="width: 25%">
+                                                    <span
+                                                        class="slds-text-body_small custom-small">{currentFile.fileSize}</span>
+                                                </td>
+                                                <td style="width: 3%">
+
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width: 26%">
+                                                    <span class="slds-text-body_small custom-small"><b>Created Date:
+                                                        </b></span>
+                                                </td>
+                                                <td style="width: 30%">
+                                                    <span
+                                                        class="slds-text-body_small custom-small">{currentFile.createdDate}</span>
+                                                </td>
+                                                <td style="width: 16%">
+                                                    <span
+                                                        class="slds-p-left_small slds-text-body_small custom-small"><b>Type:
+                                                        </b></span>
+                                                </td>
+                                                <td style="width: 25%">
+                                                    <span
+                                                        class="slds-text-body_small custom-small">{currentFile.fileType}</span>
+                                                </td>
+                                                <td style="width: 3%">
+
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+
+                                <td style="width: 6%;" class="slds-p-around_x-small">
+                                    <div lwc:if={currentFile.showGif} class="slds-align_absolute-center">
+                                        <img src={downloadGifHtml} width="50px" height="50px">
+                                    </div>
+                                    <div lwc:else style="cursor: pointer;" class="slds-align_absolute-center">
+                                        <img onclick={OnClickDownload} src={downloadImgHtml} width="50px" height="50px"
+                                            data-download-url={currentFile.downloadUrl}
+                                            data-file-name={currentFile.fileName}
+                                            data-doc-id={currentFile.contentDocuId} data-cdl-id={currentFile.cdlId}>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </template>
+        </div>
+
+        <div class="slds-p-top_x-small">
+            <div class="slds-box" style="background-color: #F3F3F3;">
+                <table>
+                    <tbody>
+                        <tr>
+                            <td style="width: 2%;">
+                            </td>
+
+                            <td style="width: 4%;">
+                                <div class="slds-align_absolute-center" title="Redirect to our site"
+                                    onclick={HandleLogoClick} style="cursor: pointer;">
+                                    <img src={brandLogo} width="25" height="25">
+                                </div>
+                            </td>
+
+                            <td style="width: 38%;">
+                                <div>
+                                    <span style="font-size: 18px; color: #DF1919; cursor: pointer;"
+                                        title="Redirect to our site" onclick={HandleLogoClick}>
+                                        <b>RedFerns Tech</b>
+                                    </span> </br>
+                                </div>
+                            </td>
+
+                            <td style="width: 42%;">
+                                <span style="font-size: 14px; color: #DF1919;">
+                                    <p>&copy; 2024 - Redferns Tech Inc.</p>
+                                </span>
+                            </td>
+
+                            <td style="width: 3%;">
+                                <div class="slds-align_absolute-center" onclick={handleLinkedInClick}
+                                    style="cursor: pointer;">
+                                    <img src={linkedInLogo} width="25" height="25">
+                                </div>
+                            </td>
+
+                            <td style="width: 3%;">
+                                <div class="slds-align_absolute-center" onclick={handleYouTubeClick}
+                                    style="cursor: pointer;">
+                                    <img src={youtubeLogo} width="25" height="25">
+                                </div>
+                            </td>
+
+                            <td style="width: 3%;">
+                                <div class="slds-align_absolute-center" onclick={handleInstagramClick}
+                                    style="cursor: pointer;">
+                                    <img src={instagramLogo} width="25" height="25">
+                                </div>
+                            </td>
+
+                            <td style="width: 3%;">
+                                <div class="slds-align_absolute-center" onclick={handleFacebookClick}
+                                    style="cursor: pointer;">
+                                    <img src={facebookLogo} width="25" height="25">
+                                </div>
+                            </td>
+
+                            <td style="width: 2%;">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </lightning-card>
+</template>

@@ -1,0 +1,239 @@
+<template>
+    <div class="slds-box">
+
+        <div class="slds-p-bottom_x-small">
+            <div style="background-color: #F3F3F3; border: 1px solid #C9C9C9" class="slds-p-around_x-small">
+                <table>
+                    <tbody>
+                        <tr>
+                            <td style="width: 6%;">
+                                <div class="slds-float_right" style="cursor: pointer;" onclick={HandleLogoClick}>
+                                    <img src={brandLogo} width="45" height="45" title="Redirect to our site">
+                                </div>
+                            </td>
+                            <td style="width: 87%;">
+                                <div class="slds-grid slds-grid_vertical">
+                                    <div>
+                                        <span style="color: #DF1919; font-size: 18px; cursor: pointer;"
+                                            title="Redirect to our site" onclick={HandleLogoClick}>
+                                            <b>RedFerns Tech Bulk File Downloader</b>
+                                        </span> &nbsp;
+                                        <span style="cursor: pointer; color: #DF1919; font-size: 15px;"
+                                            title="Redirect to our site" onclick={HandleLogoClick}>v1.0</span>
+                                    </div>
+                                    <div>
+                                        <span style="font-size: 13px;">Grab multiple files as a zip or each file
+                                            individually, all within our app with just one click.</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td style="width: 7%;">
+                                <div class="slds-float_right">
+                                    <lightning-icon style="cursor: pointer;" icon-name="action:log_event"
+                                        title="Book a Demo" size="small"
+                                        onclick={handleClickCalenderly}></lightning-icon>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+        <div lwc:if={showHeader} class="slds-p-bottom_x-small">
+            <div style="background-color: #F3F3F3; border: 1px solid #C9C9C9">
+                <table>
+                    <tr>
+                        <td class='slds-p-around_x-small' style='width:2%;'>
+                            <lightning-input label="Select All File" type="checkbox-button" data-id="selectAll"
+                                onclick={handleClickSelectAll}>
+                            </lightning-input>
+                        </td>
+
+                        <td class='slds-p-around_xx-small' style='width:12%;'>
+                            <span class="slds-text-heading_small slds-grid_vertical-align-center">Select All
+                            </span>
+                        </td>
+
+                        <td class='slds-p-around_xx-small' style='width:17%;'>
+                            <div class="slds-align_absolute-center">
+                                <lightning-combobox label="Sort By" options={sortByOptions} value={displaySortByValue}
+                                    onchange={sortByChange} class="slds-p-around_xx-small"
+                                    placeholder="Sort By"></lightning-combobox>
+                            </div>
+                        </td>
+
+                        <td class='slds-p-around_xx-small' style='width:11%;'>
+                            <div class="slds-align_absolute-center">
+                                <lightning-radio-group label="" options={ascOrDesOptions} value={ascOrDesvalue}
+                                    type="radio" onchange={ascOrDesChange}></lightning-radio-group>
+                            </div>
+                        </td>
+
+
+                        <td class='slds-p-around_xxx-small' style="width: 25%;">
+                            <div class="slds-form-element">
+                                <label class="slds-form-element__label">Search</label>
+                                <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
+                                    <input type="text" class="slds-input" placeholder="Enter FileName"
+                                        oninput={handleChangeSearchFileName} value={fileNameSearchValue}>
+                                    <button class="slds-button slds-input__icon slds-input__icon_right input"
+                                        onclick={handleClickClearInput}>
+                                        <lightning-icon icon-name="utility:clear" size="x-small"
+                                            alternative-text="Clear"></lightning-icon>
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class='slds-p-around_xx-small' style='width:23%;'>
+                            <span class="slds-align_absolute-center slds-text-heading_small"> Showing
+                                <b class="slds-m-left_xx-small slds-m-right_xx-small">{totalRecords}</b> Files
+                                <div lwc:if={showMoreThan500HelpText}>
+                                    <div class="slds-p-left_xx-small" onmouseover={HandleOnMouseOverHelpText}
+                                        onmouseleave={HandleOnMouseLeaveHelpText}>
+                                        <lightning-icon icon-name="utility:info" size="xx-small"
+                                            class="info-icon"></lightning-icon>
+                                    </div>
+
+                                    <div lwc:if={showHelpText}>
+                                        <div style="right:14%;"
+                                            class="slds-is-absolute slds-popover slds-popover_tooltip" role="tooltip"
+                                            onmouseover={HandleOnMouseOverToolTip}
+                                            onmouseleave={HandleOnMouseLeaveToolTip}>
+                                            <div class="slds-popover__body">Here,
+                                                you can see up to 500 files only. To view
+                                                all files, please use the Bulk File
+                                                Downloader App Page. </br></br>
+                                                <a style="color: #0dc7e8;" href={urlForSinglePageApp}
+                                                    target="_blank">Click Here
+                                                    to Open App Page</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </span>
+                        </td>
+
+                        <td style="width:10%; background-color:#0176D3; cursor: pointer;"
+                            onclick={OnClickMultiDownload}>
+                            <div class="slds-align_absolute-center">
+                                <lightning-icon style='--sds-c-icon-color-foreground-default:white'
+                                    icon-name="utility:download" title="Download"></lightning-icon>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div lwc:if={showNoItemsMsg} style="background-color: #F3F3F3; height: 100px;">
+            <div style="height:100%; border: 1px solid #C9C9C9" class="slds-align_absolute-center">
+                <div class="slds-text-body_small">No items to display.</div>
+            </div>
+        </div>
+
+        <div lwc:else class="slds-scrollable_y fileDiv-height">
+            <template for:each={recordsTodisplay} for:item="currentFile">
+                <div class="slds-p-bottom_x-small" key={currentFile.contentDocuId}>
+                    <table style="table-layout: fixed; border: 1px solid #C9C9C9" class={animationClass}>
+                        <tbody>
+                            <tr>
+                                <td style="width: 4%;" class="slds-p-around_x-small">
+                                    <div class="slds-align_absolute-center">
+                                        <lightning-input type="checkbox-button" data-cv-id={currentFile.cvId}
+                                            data-id="SelectFile" onclick={handleClickSelectFile}>
+                                        </lightning-input>
+                                    </div>
+                                </td>
+
+                                <td style="width: 14%;" class="slds-p-around_x-small">
+                                    <div style='width: 50px; height: 50px; background-color:white;'
+                                        class="slds-align_absolute-center slds-border_top slds-border_right slds-border_bottom slds-border_left">
+                                        <div class="imgOnhover" style="width: 100%; height: 100%;">
+                                            <img src={currentFile.thumbnailUrl}
+                                                style="object-fit: contain; width: 100%; height: 100%;">
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td style="width: 36%" class="slds-p-around_x-small">
+                                    <b><lightning-formatted-url value={currentFile.fileUrl} tooltip="Navigate to File"
+                                            label={currentFile.fileName} target="_blank"></lightning-formatted-url>
+                                    </b>
+                                </td>
+
+                                <td style="width: 38%" class="slds-p-around_x-small">
+                                    <table>
+                                        <tbody>
+
+                                            <tr>
+                                                <td style="width: 28%">
+                                                    <span class="slds-text-body_small custom-small"><b>Created By:
+                                                        </b></span>
+                                                </td>
+                                                <td style="width: 25%">
+                                                    <span
+                                                        class="slds-text-body_small custom-small">{currentFile.createdBy}</span>
+                                                </td>
+                                                <td style="width: 16%">
+                                                    <span
+                                                        class="slds-p-left_small slds-text-body_small custom-small"><b>Size:
+                                                        </b></span>
+                                                </td>
+                                                <td style="width: 25%">
+                                                    <span
+                                                        class="slds-text-body_small custom-small">{currentFile.fileSize}</span>
+                                                </td>
+                                                <td style="width: 6%">
+
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td style="width: 28%">
+                                                    <span class="slds-text-body_small custom-small"><b>Created Date:
+                                                        </b></span>
+                                                </td>
+                                                <td style="width: 25%">
+                                                    <span
+                                                        class="slds-text-body_small custom-small">{currentFile.createdDate}</span>
+                                                </td>
+                                                <td style="width: 16%">
+                                                    <span
+                                                        class="slds-p-left_small slds-text-body_small custom-small"><b>Type:
+                                                        </b></span>
+                                                </td>
+                                                <td style="width: 25%">
+                                                    <span
+                                                        class="slds-text-body_small custom-small">{currentFile.fileType}</span>
+                                                </td>
+                                                <td style="width: 6%">
+
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+
+                                <td style="width: 8%;" class="slds-p-around_x-small">
+                                    <div lwc:if={currentFile.showGif} class="slds-align_absolute-center">
+                                        <img src={downloadGifHtml} width="45px" height="45px">
+                                    </div>
+                                    <div lwc:else style="cursor: pointer;" class="slds-align_absolute-center">
+                                        <img onclick={OnClickDownload} src={downloadImgHtml} width="50px" height="50px"
+                                            data-download-url={currentFile.downloadUrl} data-cv-id={currentFile.cvId}
+                                            data-file-name={currentFile.fileName}
+                                            data-doc-id={currentFile.contentDocuId}>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </template>
+        </div>
+    </div>
+</template>
